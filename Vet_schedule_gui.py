@@ -2,37 +2,51 @@ from distutils import command
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from csv import *
+import csv
 
 
 main_list = []
 header = ["Title ", " First name ", " Last name " , " Phone # " , " Email " , " Email Opt-In Service " ,
-                             " Pet Name " , " Species " , " Pet Age " , " Gender " , " Dog Breed " , " Cat Breed"]
+                             " Pet Name " , " Species " , " Pet Age " , " Gender " , " Dog Breed " , " Cat Breed " , " Priority"]
+FILENAME = "vet_schedule.csv"
+
+#Create new file or overwrite when gui restarts
+with open(FILENAME, "w", newline='') as file:
+    Writer = csv.writer(file, delimiter=',')
+    Writer.writerow(header)
 
 
 def add():  #checks that the correct input is allowed for the different required fields, then grabs all the entries and appends them into the main list
     name_characters = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-") #this is setting that only string characters can be entered to validate input
                                                                                         #for the schedule
+    phone_characters = set("123456789-")
     if not (name_characters.issuperset(first_name_entry.get()) and name_characters.issuperset(last_name_entry.get()) 
         and name_characters.issuperset(petname_entry.get())):
         messagebox.showerror("Error","The first name, last name and pet name must be letters. Try again.")
 
-    phone_characters = set("123456789-")
-    if not (phone_characters.issuperset(phone_label_entry.get())):
+    
+    elif not (phone_characters.issuperset(phone_label_entry.get())):
         messagebox.showerror("Error","That is not a phone number. Try again.")
 
-    lst = [title_combobox.get() + ' ', first_name_entry.get() + ' ', last_name_entry.get() +' ', phone_label_entry.get() + ' ' ,
+    else:
+        messagebox.showinfo("Check-In", "You are checked in.")
+        with open(FILENAME, "r") as csv_file:
+            priority = len(list(csv_file))
+            
+        lst = [title_combobox.get() + ' ', first_name_entry.get() + ' ', last_name_entry.get() +' ', phone_label_entry.get() + ' ' ,
             email_label_entry.get() +' ', email_opt_combobox.get() +' ', petname_entry.get() +' ', pet_species_combobox.get() +' ' ,
-             petage_spinbox.get() +' ', pet_gender_combobox.get() +' ', dogbreed_combobox.get() +' ', catbreed_combobox.get()]
-    main_list.append(lst)
-    messagebox.showinfo("Check-In", "You are checking in.")
+             petage_spinbox.get() +' ', pet_gender_combobox.get() +' ', dogbreed_combobox.get() +' ', catbreed_combobox.get()+ ' ', priority]
+        main_list.append(lst)
+    
 
-def save():#This function is what creates the csv file and combines the header that was created at the top along with writing the main list that
+def save():#This function is what appends to the csv file and combines the header that was created at the top along with writing the main list that
             #holds all the entries, then when the button is clicked it will tell the user the information was saved successfully
-    with open("vet_schedule.csv", "w") as file:
-        Writer = writer(file, delimiter=',')
-        Writer.writerow(header)
-        Writer.writerows(main_list)
+    with open(FILENAME, "a", newline='') as file:
+        Writer = csv.writer(file, delimiter=',')
+        for item in main_list:
+            print(f'Item: {item}')
+            Writer.writerow(item)
+            main_list.remove(item)
         messagebox.showinfo("Check-In", "Your information was saved successfully.")
 
 def clear():#This function is used if you need to add multiple entries at the same time and will clear all the

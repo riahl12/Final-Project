@@ -1,8 +1,9 @@
 import heapq
+import csv
 
 class PatientInfo: #This class takes in attributes for the owner first and last name, pet name, species and priority(meaning what order will the vet see them in)
     def __init__(self, o_fname, o_lname, petname, species, priority):
-        name_characters = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-") #this is setting that only string characters can be entered to validate input
+        name_characters = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'- ") #this is setting that only string characters can be entered to validate input
                                                                                         #for the schedule
         if not (name_characters.issuperset(o_fname) and name_characters.issuperset(o_lname) 
             and name_characters.issuperset(petname) and name_characters.issuperset(species)):
@@ -32,7 +33,6 @@ class Schedule: #The class initializes an empty list to save the information gat
                 else:
                     self.pqueue.insert(x, node)
 
-
     def delete(self): #This function will take off the highest priority appointment first since the highest
                         #priority will always be at index 0
         return self.pqueue.pop(0)
@@ -49,24 +49,21 @@ class Schedule: #The class initializes an empty list to save the information gat
 
 if __name__ == "__main__":
     schedule1 = Schedule()
-    pet1 = PatientInfo("John","Smith","Ginger","Cat","1")
-    pet2 = PatientInfo("Jane", "Doe", "Sam", "Dog","2")
-    pet5 = PatientInfo("bob","dylan","sparky","cat","5")
-    pet3 = PatientInfo("Holly", "Johnson", "Kenny", "Other","3")
-    pet4 = PatientInfo("Sam", "Jackson", "Percy", "Dog","4")
-    pet6 = PatientInfo("Hailey","Jones","sally","Cat","6")
-   
-
-    schedule1.insert(pet3)
-    schedule1.insert(pet1)
-    schedule1.insert(pet2)
-    schedule1.insert(pet5)
-    schedule1.insert(pet4)
-    schedule1.insert(pet6)
-    schedule1.print()
-    print("Today's schedule has:",schedule1.size()," patients.")
-
     
+    with open("vet_schedule.csv", "r") as file:
+        csv_file = csv.reader(file)
+
+        for row in csv_file:
+            if row[0] == 'Title ': # skip the header row in file
+                continue
+            else:
+                pet = PatientInfo(row[1], row[2], row[6], row[7], row[12]) #rows in the csv file
+                schedule1.insert(pet)
+
+    print("Today's schedule has:",schedule1.size()," patients.\n")
+    print("Today's patients:")
+    schedule1.print()
+
     print("\nSchedule after 2 patients have been seen:")
     schedule1.delete()
     schedule1.delete()
